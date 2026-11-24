@@ -6,11 +6,11 @@
 [[ $- != *i* ]] && return
 
 fastfetch
-alias ls='ls --color=auto'
+alias ls='ls --color=auto --group-directories-first'
 alias grep='grep --color=auto'
 PS1='\033[32m\][\u@\h \033[34m\]\W\033[32m\]]\$ \033[37m\]'
-alias ll='ls --color=auto -l'
+alias ll='ls --color=auto -l --group-directories-first'
 alias vim='nvim'
 alias sudo='sudo '
 export EDITOR=/usr/bin/nvim
-alias lla='ls --color=auto -la'
+alias lla='ls --color=auto -laA --group-directories-first'
