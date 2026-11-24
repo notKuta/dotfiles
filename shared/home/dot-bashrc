@@ -14,3 +14,4 @@ alias vim='nvim'
 alias sudo='sudo '
 export EDITOR=/usr/bin/nvim
 alias lla='ls --color=auto -laA --group-directories-first'
+alias icat='kitten icat'
