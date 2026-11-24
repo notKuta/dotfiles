@@ -1,0 +1,10 @@
+arch-update
+faugus-launcher
+konsave
+limine-mkinitcpio-hook
+limine-snapper-sync
+paru
+paru-debug
+protonplus
+zen-browser-bin
+zenergy-dkms-git
