@@ -119,8 +119,8 @@ powerdevil
 print-manager
 prismlauncher
 protontricks
+qbittorrent
 qqc2-breeze-style
-ranger
 reflector
 samba
 schedtool
@@ -140,7 +140,10 @@ thunderbird
 tree
 ufw
 union
+virtualbox
+virtualbox-host-dkms
 vulkan-headers
 wget
 xdg-desktop-portal-kde
+xorg-xlsclients
 yasm
