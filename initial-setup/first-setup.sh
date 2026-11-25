@@ -23,6 +23,7 @@ case $(cat /etc/hostname) in
         # This installs packages from a list, while not reinstalling previously
         # installed packages that are already up-to-date
         sudo pacman -S --needed - < ../pkgs/pkglist-poseidon.txt
+        sudo pacman -S --asdeps ntsync-autoload
 
         # Systemd Units
         # Remember; not specifiying the end of a daemon implies
@@ -43,6 +44,9 @@ case $(cat /etc/hostname) in
         sudo ufw allow 5353/udp comment "Avahi; Printer Discovery"
         sudo ufw enable
 
+        # SystemD Resolved DNS
+        ln -sf ../run/systemd/resolve/stub-resolv.conf /etc/resolv.conf
+
         # Build Paru from the AUR
         # mkdir -p /home/$SUDO_USER/Projects
         # cd /home/$SUDO_USER/Projects
@@ -54,6 +58,8 @@ case $(cat /etc/hostname) in
         makepkg -sirc
 
         # Install rest of AUR packages w/ Paru
+        # Extra commands needed as `paru-debug` will show up in the list
+        # which is not on the AUR which results in an error
         paru -Ta - < ../pkgs/foreignpkglist-poseidon.txt > ../pkgs/tmp.txt
         paru -S --needed - < ../pkgs/tmp.txt
         rm ../pkgs/tmp.txt
