@@ -35,7 +35,7 @@ case $(cat /etc/hostname) in
         sudo systemctl enable fstrim.timer --now
         sudo systemctl enable btrfs-scrub@-.timer --now
         sudo systemctl enable systemd-timesyncd --now
-        # systemctl enable snapper-cleanup --now
+        sudo systemctl enable snapper-cleanup --now
 
         # Firewall / Printer Set-up
         sudo ufw default deny
@@ -54,7 +54,9 @@ case $(cat /etc/hostname) in
         makepkg -sirc
 
         # Install rest of AUR packages w/ Paru
-        paru -S ...
+        paru -Ta - < ../pkgs/foreignpkglist-poseidon.txt > ../pkgs/tmp.txt
+        paru -S --needed - < ../pkgs/tmp.txt
+        rm ../pkgs/tmp.txt
 
         # Needed to create new Snapper configuration as the @snapshots subvolume is already
         # mounted; in the initial script could not mount the snapshots subvolume 'til after this

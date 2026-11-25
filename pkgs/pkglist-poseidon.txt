@@ -121,6 +121,7 @@ prismlauncher
 protontricks
 qbittorrent
 qqc2-breeze-style
+ranger
 reflector
 samba
 schedtool
