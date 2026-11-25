@@ -15,6 +15,10 @@
 # $ git clone ...
 # **********************************************
 
+### Set up logging ###
+exec 1> >(tee "stdout.log")
+exec 2> >(tee "stderr.log")
+
 case $(cat /etc/hostname) in
     "poseidon")
         # printf "Hello! This is Poseidon speaking! :D\n"
@@ -99,7 +103,11 @@ case $(cat /etc/hostname) in
         WANTEDMODULES="MODULES=( nvidia nvidia_modeset nvidia_uvm nvidia_drm k10temp )"
         sudo sed "s/^MODULES=.*/${WANTEDMODULES}/" /etc/mkinitcpio.conf | sudo tee /etc/tmp3.conf && sudo mv /etc/tmp3.conf /etc/mkinitcpio.conf
 
-        reboot
+        konsave --import-profile ~/.config/main.knsv
+        konsave --apply main
+
+        printf "\nInstallation is done!\n\nRestart the system!\n"
+        # reboot
 
         ;;
     "neptune")
