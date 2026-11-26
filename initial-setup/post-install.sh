@@ -18,7 +18,6 @@
 ### Gather variables from past script
 
 part_root=$(sudo cat /root/partition-root.txt)
-sudo rm /root/partition-root.txt
 
 ### Set up logging ###
 exec 1> >(tee "stdout.log")
@@ -159,3 +158,4 @@ case $(cat /etc/hostname) in
         ;;
 esac
 
+sudo rm /root/partition-root.txt
