@@ -15,6 +15,11 @@
 # $ git clone ...
 # **********************************************
 
+### Gather variables from past script
+
+part_root=$(sudo cat /root/partition-root.txt)
+sudo rm /root/partition-root.txt
+
 ### Set up logging ###
 exec 1> >(tee "stdout.log")
 exec 2> >(tee "stderr.log")
@@ -113,6 +118,30 @@ case $(cat /etc/hostname) in
         WANTEDMODULES="MODULES=( nvidia nvidia_modeset nvidia_uvm nvidia_drm k10temp )"
         sudo sed "s/^MODULES=.*/${WANTEDMODULES}/" /etc/mkinitcpio.conf | sudo tee /etc/tmp3.conf && sudo mv /etc/tmp3.conf /etc/mkinitcpio.conf
 
+        ####### TPM ENCRYPTION #########
+
+        printf "Generating recovery key for LUKS volume...\n\n"
+        systemd-cryptenroll ${part_root} --recovery-key
+
+
+        printf "Make sure to store your recovery key in a secure location.\n"
+        printf "This is what you will use if your TPM device cannot authenticate\n"
+        printf "properly e.g. if one of the PCR policies gets triggered. If\n"
+        printf "you do not store these, then you will be locked out of your computer.\n\n"
+
+        printf '%s' "Press any key to continue AFTER you've written it down..."; IFS= read -r <"/dev/tty"
+
+        systemd-cryptenroll ${part_root}
+
+        printf "Which keyslots would you like to wipe before enrolling TPM?\n"
+        printf "Enter the keyslot number ie '1', '2' etc. OR 'empty' if you\n"
+        printf "do not want to wipe a keyslot: "
+        read keyslotAnswer
+        : ${keyslotAnswer:?"answer cannot be empty"}
+
+        systemd-cryptenroll ${part_root} --wipe-slot=${keyslotAnswer} --tpm2-device=auto --tpm2-pcrs=4+12+15:sha256=0000000000000000000000000000000000000000000000000000000000000000
+
+        # Konsave to apply Plasma settings
         konsave --import-profile ~/.config/main.knsv
         konsave --apply main
 
