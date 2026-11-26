@@ -27,7 +27,7 @@ exec 2> >(tee "stderr.log")
 case $(cat /etc/hostname) in
     "poseidon")
         # printf "Hello! This is Poseidon speaking! :D\n"
-        ./first-setup-stow.sh
+        ./post-install-stow.sh
         git reset --hard
         # This installs packages from a list, while not reinstalling previously
         # installed packages that are already up-to-date
@@ -137,7 +137,7 @@ case $(cat /etc/hostname) in
         printf "Enter the keyslot number ie '1', '2' etc. OR 'empty' if you\n"
         printf "do not want to wipe a keyslot: "
         read keyslotAnswer
-        : ${keyslotAnswer:?"answer cannot be empty"}
+        : ${keyslotAnswer:?"answer cannot be nothing"}
 
         systemd-cryptenroll ${part_root} --wipe-slot=${keyslotAnswer} --tpm2-device=auto --tpm2-pcrs=4+12+15:sha256=0000000000000000000000000000000000000000000000000000000000000000
 
