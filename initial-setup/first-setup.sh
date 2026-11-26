@@ -71,10 +71,20 @@ case $(cat /etc/hostname) in
         # Needed to create new Snapper configuration as the @snapshots subvolume is already
         # mounted; in the initial script could not mount the snapshots subvolume 'til after this
         # step but need more time
-        sudo umount -R /.snapshots && sudo rm -r /.snapshots
-        sudo snapper -c root create-config /.snapshots
-        sudo umount -R /.snapshots && sudo btrfs subvolume delete /.snapshots
-        sudo mkdir /.snapshots && mount -o compress=zstd,subvol=/@snapshots /dev/mapper/root /.snapshots
+        # Currently, Snapper config is stored in `/etc/snapper/config/*` and its global counterpart
+        # is in `/etc/conf.d/snapper` where both are currently under version control w/ stow under
+        # ~/dotfiles
+
+        # sudo umount -R /.snapshots && sudo rm -r /.snapshots
+        # sudo snapper -c root create-config /.snapshots
+        # sudo umount -R /.snapshots && sudo btrfs subvolume delete /.snapshots
+        # sudo mkdir /.snapshots && mount -o compress=zstd,subvol=/@snapshots /dev/mapper/root /.snapshots
+
+        # Adds support OverlayFS in order for snapshots to act as a Live CD environment to
+        # try out different packages or other things without affecting the current environment
+        # as all changes exist within RAM
+        desiredHookLine="HOOKS=(base systemd autodetect microcode modconf kms keyboard sd-vconsole block sd-encrypt filesystems sd-btrfs-overlayfs fsck)"
+        sed "s/^HOOKS=.*/${desiredHookLine}/" /etc/mkinitcpio.conf > /etc/tmp4.conf && mv /etc/tmp4.conf /etc/mkinitcpio.conf
 
         # Run *AFTER* installing arch-update i.e. after installing
         # our foreign, AUR packages

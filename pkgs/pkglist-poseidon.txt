@@ -123,6 +123,7 @@ qbittorrent
 qqc2-breeze-style
 ranger
 reflector
+rsync
 samba
 schedtool
 sddm-kcm
