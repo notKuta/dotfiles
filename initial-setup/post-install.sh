@@ -52,7 +52,6 @@ case $(cat /etc/hostname) in
         sudo systemctl enable btrfs-scrub@-.timer --now
         sudo systemctl enable systemd-timesyncd --now
         sudo systemctl enable snapper-cleanup.timer --now
-        sudo systemctl enable systemd-resolved --now
 
         # Firewall / Printer Set-up
         sudo ufw default deny
@@ -60,10 +59,7 @@ case $(cat /etc/hostname) in
         sudo ufw allow 5353/udp comment "Avahi; Printer Discovery"
         sudo ufw enable
 
-        # SystemD Resolved DNS
-        sudo ln -sf ../run/systemd/resolve/stub-resolv.conf /etc/resolv.conf
-
-        # Build Paru from the AUR
+                # Build Paru from the AUR
         # mkdir -p /home/$SUDO_USER/Projects
         # cd /home/$SUDO_USER/Projects
         mkdir -p ~/Projects
@@ -84,6 +80,10 @@ case $(cat /etc/hostname) in
         paruFailure=$?
         rm ../pkgs/tmp.txt
 
+	# SystemD Resolved DNS
+        sudo systemctl enable systemd-resolved --now
+        sudo ln -sf ../run/systemd/resolve/stub-resolv.conf /etc/resolv.conf
+
         # Needed to create new Snapper configuration as the @snapshots subvolume is already
         # mounted; in the initial script could not mount the snapshots subvolume 'til after this
         # step but need more time
@@ -100,11 +100,27 @@ case $(cat /etc/hostname) in
         ./post-install-stow.sh
         git reset --hard
 
+        # Create BTRFS swapfile for zswap use (zswap is automatically enabled in Arch kernels)
+        sudo btrfs filesystem mkswapfile --size $(free -m | grep "Mem:" | awk '{print $2}')m --uuid clear /.swap/swapfile
+        echo "/.swap/swapfile none swap defaults 0 0" | sudo tee -a /etc/fstab > /dev/null
+
         # Adds support OverlayFS in order for snapshots to act as a Live CD environment to
         # try out different packages or other things without affecting the current environment
         # as all changes exist within RAM
         desiredHookLine="HOOKS=(base systemd autodetect microcode modconf kms keyboard sd-vconsole block sd-encrypt filesystems sd-btrfs-overlayfs fsck)"
         sudo sed --in-place=.bak "s/^HOOKS=.*/${desiredHookLine}/" /etc/mkinitcpio.conf
+
+        # Adds old kernel parameters to new ones and to be read from `/etc/kernel/cmdline`
+        # Which is a more universal placement for kernel parameters
+        KERNELCMDLINE=$( sudo cat /boot/EFI/arch-limine/limine.conf | grep "cmdline:" | sed -n -e 's/^.*:\ //p' )
+        NEWKERNELCMDLINE="${KERNELCMDLINE} splash quiet zswap.max_pool_percent=30"
+        echo ${NEWKERNELCMDLINE} | sudo tee /etc/kernel/cmdline > /dev/null
+
+        # Automatically enable preloading of NVIDIA modules in order to see the plymouth
+        # screen actually show up; NOTE: this breaks hibernation; also preloads the k10temp
+        # module which is used for reading wattage / temperature of AMD CPUs thru MangoHud
+        WANTEDMODULES="MODULES=( nvidia nvidia_modeset nvidia_uvm nvidia_drm k10temp )"
+        sudo sed --in-place=.bak "s/^MODULES=.*/${WANTEDMODULES}/" /etc/mkinitcpio.conf
 
         # Run *AFTER* installing arch-update i.e. after installing
         # our foreign, AUR packages
@@ -113,29 +129,13 @@ case $(cat /etc/hostname) in
         limine-update
         limine-snapper-sync
 
-        # Create BTRFS swapfile for zswap use (zswap is automatically enabled in Arch kernels)
-        sudo btrfs filesystem mkswapfile --size $(free -m | grep "Mem:" | awk '{print $2}')m --uuid clear /.swap/swapfile
-        echo "/.swap/swapfile none swap defaults 0 0" | sudo tee -a /etc/fstab > /dev/null
-
-        # Adds old kernel parameters to new ones and to be read from `/etc/kernel/cmdline`
-        # Which is a more universal placement for kernel parameters
-        KERNELCMDLINE=$( sudo cat /boot/EFI/arch-limine/limine.conf | grep "cmdline:" | sed -n -e 's/^.*:\ //p' )
-        NEWKERNELCMDLINE="${KERNELCMDLINE} splash quiet zswap.max_pool_percent=30"
-        echo ${NEWKERNELCMDLINE} | sudo tee /etc/kernel/cmdline > /dev/null
-
-        # Removes obsolete EFI/boot entries *AFTER* `limine-mkinitcpio-hook` generates
+	# Removes obsolete EFI/boot entries *AFTER* `limine-mkinitcpio-hook` generates
         # its own, more organized entries
         # Preserves the boot partition if the AUR Limine tools ie `limine-mkinitcpio-hook`
         # and `limine-snapper=sync` can not be installed`
         if [ ${paruFailure} -eq 0 ]; then
                 sudo rm -r /boot/EFI/arch-limine
         fi
-
-        # Automatically enable preloading of NVIDIA modules in order to see the plymouth
-        # screen actually show up; NOTE: this breaks hibernation; also preloads the k10temp
-        # module which is used for reading wattage / temperature of AMD CPUs thru MangoHud
-        WANTEDMODULES="MODULES=( nvidia nvidia_modeset nvidia_uvm nvidia_drm k10temp )"
-        sudo sed --in-place=.bak "s/^MODULES=.*/${WANTEDMODULES}/" /etc/mkinitcpio.conf
 
         ####### TPM ENCRYPTION #########
 
