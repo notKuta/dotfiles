@@ -30,6 +30,7 @@ case $(cat /etc/hostname) in
         git reset --hard
         # This installs packages from a list, while not reinstalling previously
         # installed packages that are already up-to-date
+        sudo pacman -Syu
         sudo pacman -S --needed - < ../pkgs/pkglist-poseidon.txt
         sudo pacman -S --asdeps ntsync-autoload
 
@@ -53,7 +54,7 @@ case $(cat /etc/hostname) in
         sudo ufw enable
 
         # SystemD Resolved DNS
-        ln -sf ../run/systemd/resolve/stub-resolv.conf /etc/resolv.conf
+        sudo ln -sf ../run/systemd/resolve/stub-resolv.conf /etc/resolv.conf
 
         # Build Paru from the AUR
         # mkdir -p /home/$SUDO_USER/Projects
@@ -119,18 +120,21 @@ case $(cat /etc/hostname) in
 
         ####### TPM ENCRYPTION #########
 
-        printf "Generating recovery key for LUKS volume...\n\n"
-        systemd-cryptenroll ${part_root} --recovery-key
+        clear
 
+        printf "Generating recovery key for LUKS volume...\n\n"
+        sudo systemd-cryptenroll ${part_root} --recovery-key
 
         printf "Make sure to store your recovery key in a secure location.\n"
         printf "This is what you will use if your TPM device cannot authenticate\n"
         printf "properly e.g. if one of the PCR policies gets triggered. If\n"
         printf "you do not store these, then you will be locked out of your computer.\n\n"
 
-        printf '%s' "Press any key to continue AFTER you've written it down..."; IFS= read -r <"/dev/tty"
+        read -p "Press Enter to continue IF everything looks good..." </dev/tty
 
-        systemd-cryptenroll ${part_root}
+        clear
+
+        sudo systemd-cryptenroll ${part_root}
 
         printf "Which keyslots would you like to wipe before enrolling TPM?\n"
         printf "Enter the keyslot number ie '1', '2' etc. OR 'empty' if you\n"
@@ -138,13 +142,15 @@ case $(cat /etc/hostname) in
         read keyslotAnswer
         : ${keyslotAnswer:?"answer cannot be nothing"}
 
-        systemd-cryptenroll ${part_root} --wipe-slot=${keyslotAnswer} --tpm2-device=auto --tpm2-pcrs=4+12+15:sha256=0000000000000000000000000000000000000000000000000000000000000000
+        sudo systemd-cryptenroll ${part_root} --wipe-slot=${keyslotAnswer} --tpm2-device=auto --tpm2-pcrs=4+12+15:sha256=0000000000000000000000000000000000000000000000000000000000000000
 
         # Konsave to apply Plasma settings
         konsave --import-profile ~/.config/main.knsv
         konsave --apply main
 
-        printf "\nInstallation is done!\n\nRestart the system!\n"
+        clear
+
+        printf "Installation is done!\n\nRestart the system!\n\n"
         # reboot
 
         ;;
