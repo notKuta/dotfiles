@@ -62,6 +62,9 @@ case $(cat /etc/hostname) in
         # SystemD Resolved DNS
         # sudo ln -sf ../run/systemd/resolve/stub-resolv.conf /etc/resolv.conf
 
+        ./post-install-stow.sh
+        git reset --hard
+
         # Build Paru from the AUR
         # mkdir -p /home/$SUDO_USER/Projects
         # cd /home/$SUDO_USER/Projects
@@ -77,13 +80,10 @@ case $(cat /etc/hostname) in
         # Install rest of AUR packages w/ Paru
         # Extra commands needed as `paru-debug` will show up in the list
         # which is not on the AUR which results in an error
+        cd ~/dotfiles/initial-setup
         paru -Ta - < ../pkgs/foreignpkglist-poseidon.txt > ../pkgs/tmp.txt
         paru -S --needed - < ../pkgs/tmp.txt
         rm ../pkgs/tmp.txt
-
-        cd ~/dotfiles/initial-setup
-        ./post-install-stow.sh
-        git reset --hard
 
         # Needed to create new Snapper configuration as the @snapshots subvolume is already
         # mounted; in the initial script could not mount the snapshots subvolume 'til after this
