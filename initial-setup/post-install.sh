@@ -92,9 +92,9 @@ case $(cat /etc/hostname) in
         # ~/dotfiles
 
         sudo umount -R /.snapshots && sudo rm -r /.snapshots
-        sudo snapper -c root create-config /.snapshots
+        sudo snapper -c root create-config /
         sudo umount -R /.snapshots && sudo btrfs subvolume delete /.snapshots
-        sudo mkdir /.snapshots && mount -o compress=zstd,subvol=/@snapshots /dev/mapper/root /.snapshots
+        sudo mkdir /.snapshots && sudo mount -o compress=zstd,subvol=/@snapshots /dev/mapper/root /.snapshots
 
          # Setup dotfiles
         ./post-install-stow.sh
