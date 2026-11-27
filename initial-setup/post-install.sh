@@ -64,6 +64,8 @@ case $(cat /etc/hostname) in
         git clone https://aur.archlinux.org/paru.git
         cd paru
         less PKGBUILD
+        read -p "Press Enter to continue..." </dev/tty
+        clear
         makepkg -sirc
 
         # Install rest of AUR packages w/ Paru
