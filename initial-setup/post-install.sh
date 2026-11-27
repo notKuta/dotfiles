@@ -1,4 +1,4 @@
-#!/bin/bash
+
 
 # *********PRE-STEPS WHICH MUST BE DONE*********
 # Before continuing, make sure to have Git setup in order
@@ -37,14 +37,15 @@ case $(cat /etc/hostname) in
         # This installs packages from a list, while not reinstalling previously
         # installed packages that are already up-to-date
         sudo pacman -Syu
-	# Install these two dependencies directly
-	# So can simply use default choice for the rest of the dependencies
-	# shown when installing main packages. For some reason in the virtual
-	# console used when no display manager is used, pacman  does not show
-	# the list of dependencies to choose from; this should help this as now
-	# we can simply press <Enter> repeatedly until done
-	sudo pacman -S --asdeps pipewire-jack
-	sudo pacman -S --asdeps lib32-nvidia-utils
+
+        # Install these two dependencies directly
+        # So can simply use default choice for the rest of the dependencies
+        # shown when installing main packages. For some reason in the virtual
+        # console used when no display manager is used, pacman  does not show
+        # the list of dependencies to choose from; this should help this as now
+        # we can simply press <Enter> repeatedly until done
+        sudo pacman -S --asdeps pipewire-jack
+        sudo pacman -S --asdeps lib32-nvidia-utils
 
         sudo pacman -S --needed - < ../pkgs/pkglist-poseidon.txt
         sudo pacman -S --asdeps ntsync-autoload
@@ -68,7 +69,7 @@ case $(cat /etc/hostname) in
         sudo ufw allow 5353/udp comment "Avahi; Printer Discovery"
         sudo ufw enable
 
-                # Build Paru from the AUR
+        # Build Paru from the AUR
         # mkdir -p /home/$SUDO_USER/Projects
         # cd /home/$SUDO_USER/Projects
         mkdir -p ~/Projects
@@ -89,7 +90,7 @@ case $(cat /etc/hostname) in
         paruFailure=$?
         rm ../pkgs/tmp.txt
 
-	# SystemD Resolved DNS
+        # SystemD Resolved DNS
         sudo systemctl enable systemd-resolved --now
         sudo ln -sf ../run/systemd/resolve/stub-resolv.conf /etc/resolv.conf
 
@@ -102,8 +103,8 @@ case $(cat /etc/hostname) in
 
         sudo umount -R /.snapshots && sudo rm -r /.snapshots
         sudo snapper -c root create-config /
-        sudo umount -R /.snapshots && sudo btrfs subvolume delete /.snapshots
-        sudo mkdir /.snapshots && sudo mount -o compress=zstd,subvol=/@snapshots /dev/mapper/root /.snapshots
+        sudo btrfs subvolume delete -R /.snapshots
+        sudo mount -o compress=zstd,subvol=/@snapshots --mkdir /dev/mapper/root /.snapshots
 
          # Setup dotfiles
         ./post-install-stow.sh
@@ -138,10 +139,10 @@ case $(cat /etc/hostname) in
         limine-update
         limine-snapper-sync
 
-	# Removes obsolete EFI/boot entries *AFTER* `limine-mkinitcpio-hook` generates
+        # Removes obsolete EFI/boot entries *AFTER* `limine-mkinitcpio-hook` generates
         # its own, more organized entries
         # Preserves the boot partition if the AUR Limine tools ie `limine-mkinitcpio-hook`
-        # and `limine-snapper=sync` can not be installed`
+        # and `limine-snapper=sync` can not be installed or fail
         if [ ${paruFailure} -eq 0 ]; then
                 sudo rm -r /boot/EFI/arch-limine
         fi
