@@ -84,10 +84,6 @@ case $(cat /etc/hostname) in
         paruFailure=$?
         rm ../pkgs/tmp.txt
 
-        # Setup dotfiles
-        ./post-install-stow.sh
-        git reset --hard
-
         # Needed to create new Snapper configuration as the @snapshots subvolume is already
         # mounted; in the initial script could not mount the snapshots subvolume 'til after this
         # step but need more time
@@ -95,10 +91,14 @@ case $(cat /etc/hostname) in
         # is in `/etc/conf.d/snapper` where both are currently under version control w/ stow under
         # ~/dotfiles
 
-        # sudo umount -R /.snapshots && sudo rm -r /.snapshots
-        # sudo snapper -c root create-config /.snapshots
-        # sudo umount -R /.snapshots && sudo btrfs subvolume delete /.snapshots
-        # sudo mkdir /.snapshots && mount -o compress=zstd,subvol=/@snapshots /dev/mapper/root /.snapshots
+        sudo umount -R /.snapshots && sudo rm -r /.snapshots
+        sudo snapper -c root create-config /.snapshots
+        sudo umount -R /.snapshots && sudo btrfs subvolume delete /.snapshots
+        sudo mkdir /.snapshots && mount -o compress=zstd,subvol=/@snapshots /dev/mapper/root /.snapshots
+
+         # Setup dotfiles
+        ./post-install-stow.sh
+        git reset --hard
 
         # Adds support OverlayFS in order for snapshots to act as a Live CD environment to
         # try out different packages or other things without affecting the current environment
