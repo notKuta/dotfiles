@@ -52,6 +52,7 @@ case $(cat /etc/hostname) in
         sudo systemctl enable btrfs-scrub@-.timer --now
         sudo systemctl enable systemd-timesyncd --now
         sudo systemctl enable snapper-cleanup.timer --now
+        sudo systemctl enable systemd-resolved --now
 
         # Firewall / Printer Set-up
         sudo ufw default deny
@@ -60,7 +61,7 @@ case $(cat /etc/hostname) in
         sudo ufw enable
 
         # SystemD Resolved DNS
-        # sudo ln -sf ../run/systemd/resolve/stub-resolv.conf /etc/resolv.conf
+        sudo ln -sf ../run/systemd/resolve/stub-resolv.conf /etc/resolv.conf
 
         # Build Paru from the AUR
         # mkdir -p /home/$SUDO_USER/Projects
@@ -182,4 +183,4 @@ case $(cat /etc/hostname) in
         ;;
 esac
 
-# sudo rm /root/partition-root.txt
+sudo rm /root/partition-root.txt
