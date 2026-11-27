@@ -27,11 +27,12 @@ case $(cat /etc/hostname) in
     "poseidon")
         # printf "Hello! This is Poseidon speaking! :D\n"
 
-        STEAMFIX="[multilib]"
-        sudo sed "s/^\#[multilib]/${STEAMFIX}/" /etc/pacman.conf | sudo tee /etc/tmp5.conf && sudo mv /etc/tmp5.conf /etc/pacman.conf
 
+        # Allows to install steam
+        # We can't stow before this as introduces errors.
+        STEAMFIX="[multilib]"
         STEAMFIXOTHER="Include = /etc/pacman.d/mirrorlist"
-        sudo sed "s/^\#Include = /etc/pacman.d/mirrorlist/${STEAMFIXOTHER}/" /etc/pacman.conf | sudo tee /etc/tmp5.conf && sudo mv /etc/tmp5.conf /etc/pacman.conf
+        sudo sed --in-place=.bak "s%^#\[multilib\]%${STEAMFIX}\\n${STEAMFIXOTHER}%" /etc/pacman.conf
 
         # This installs packages from a list, while not reinstalling previously
         # installed packages that are already up-to-date
@@ -99,7 +100,7 @@ case $(cat /etc/hostname) in
         # try out different packages or other things without affecting the current environment
         # as all changes exist within RAM
         desiredHookLine="HOOKS=(base systemd autodetect microcode modconf kms keyboard sd-vconsole block sd-encrypt filesystems sd-btrfs-overlayfs fsck)"
-        sed "s/^HOOKS=.*/${desiredHookLine}/" /etc/mkinitcpio.conf > /etc/tmp4.conf && mv /etc/tmp4.conf /etc/mkinitcpio.conf
+        sudo sed --in-place=.bak "s/^HOOKS=.*/${desiredHookLine}/" /etc/mkinitcpio.conf
 
         # Run *AFTER* installing arch-update i.e. after installing
         # our foreign, AUR packages
@@ -126,7 +127,7 @@ case $(cat /etc/hostname) in
         # screen actually show up; NOTE: this breaks hibernation; also preloads the k10temp
         # module which is used for reading wattage / temperature of AMD CPUs thru MangoHud
         WANTEDMODULES="MODULES=( nvidia nvidia_modeset nvidia_uvm nvidia_drm k10temp )"
-        sudo sed "s/^MODULES=.*/${WANTEDMODULES}/" /etc/mkinitcpio.conf | sudo tee /etc/tmp3.conf && sudo mv /etc/tmp3.conf /etc/mkinitcpio.conf
+        sudo sed --in-place=.bak "s/^MODULES=.*/${WANTEDMODULES}/" /etc/mkinitcpio.conf
 
         ####### TPM ENCRYPTION #########
 
