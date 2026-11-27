@@ -26,8 +26,6 @@ exec 2> >(tee "stderr.log")
 case $(cat /etc/hostname) in
     "poseidon")
         # printf "Hello! This is Poseidon speaking! :D\n"
-        ./post-install-stow.sh
-        git reset --hard
         # This installs packages from a list, while not reinstalling previously
         # installed packages that are already up-to-date
         sudo pacman -Syu
@@ -66,6 +64,7 @@ case $(cat /etc/hostname) in
         less PKGBUILD
         read -p "Press Enter to continue..." </dev/tty
         clear
+        sudo pacman -S base-devel
         makepkg -sirc
 
         # Install rest of AUR packages w/ Paru
@@ -74,6 +73,9 @@ case $(cat /etc/hostname) in
         paru -Ta - < ../pkgs/foreignpkglist-poseidon.txt > ../pkgs/tmp.txt
         paru -S --needed - < ../pkgs/tmp.txt
         rm ../pkgs/tmp.txt
+
+        ./post-install-stow.sh
+        git reset --hard
 
         # Needed to create new Snapper configuration as the @snapshots subvolume is already
         # mounted; in the initial script could not mount the snapshots subvolume 'til after this
