@@ -34,8 +34,7 @@ case $(cat /etc/hostname) in
         STEAMFIXOTHER="Include = /etc/pacman.d/mirrorlist"
         sudo sed --in-place=.bak "s%^#\[multilib\]%${STEAMFIX}\\n${STEAMFIXOTHER}%" /etc/pacman.conf
 
-        # This installs packages from a list, while not reinstalling previously
-        # installed packages that are already up-to-date
+        # Refresh repos so we may install packages
         sudo pacman -Syu
 
         # Install these two dependencies directly
@@ -47,6 +46,8 @@ case $(cat /etc/hostname) in
         sudo pacman -S --asdeps pipewire-jack
         sudo pacman -S --asdeps lib32-nvidia-utils
 
+        # This installs packages from a list, while not reinstalling previously
+        # installed packages that are already up-to-date
         sudo pacman -S --needed - < ../pkgs/pkglist-poseidon.txt
         sudo pacman -S --asdeps ntsync-autoload
 
