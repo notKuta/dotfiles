@@ -26,6 +26,13 @@ exec 2> >(tee "stderr.log")
 case $(cat /etc/hostname) in
     "poseidon")
         # printf "Hello! This is Poseidon speaking! :D\n"
+
+        STEAMFIX="[multilib]"
+        sudo sed "s/^#[multilib]/${STEAMFIX}/" /etc/pacman.conf | sudo tee /etc/tmp5.conf && sudo mv /etc/tmp5.conf /etc/pacman.conf
+
+        STEAMFIXOTHER="Include = /etc/pacman.d/mirrorlist"
+        sudo sed "s/^#Include = /etc/pacman.d/mirrorlist/${STEAMFIXOTHER}/" /etc/pacman.conf | sudo tee /etc/tmp5.conf && sudo mv /etc/tmp5.conf /etc/pacman.conf
+
         # This installs packages from a list, while not reinstalling previously
         # installed packages that are already up-to-date
         sudo pacman -Syu
@@ -64,7 +71,6 @@ case $(cat /etc/hostname) in
         less PKGBUILD
         read -p "Press Enter to continue..." </dev/tty
         clear
-        sudo pacman -S base-devel
         makepkg -sirc
 
         # Install rest of AUR packages w/ Paru
