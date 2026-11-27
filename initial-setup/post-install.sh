@@ -83,6 +83,7 @@ case $(cat /etc/hostname) in
         cd ~/dotfiles/initial-setup
         paru -Ta - < ../pkgs/foreignpkglist-poseidon.txt > ../pkgs/tmp.txt
         paru -S --needed - < ../pkgs/tmp.txt
+        paruFailure=$?
         rm ../pkgs/tmp.txt
 
         # Needed to create new Snapper configuration as the @snapshots subvolume is already
@@ -122,7 +123,11 @@ case $(cat /etc/hostname) in
 
         # Removes obsolete EFI/boot entries *AFTER* `limine-mkinitcpio-hook` generates
         # its own, more organized entries
-        sudo rm -r /boot/EFI/arch-limine
+        # Preserves the boot partition if the AUR Limine tools ie `limine-mkinitcpio-hook`
+        # and `limine-snapper=sync` can not be installed`
+        if [ ${paruFailure} -eq 0 ]; then
+                sudo rm -r /boot/EFI/arch-limine
+        fi
 
         # Automatically enable preloading of NVIDIA modules in order to see the plymouth
         # screen actually show up; NOTE: this breaks hibernation; also preloads the k10temp
@@ -176,4 +181,4 @@ case $(cat /etc/hostname) in
         ;;
 esac
 
-sudo rm /root/partition-root.txt
+# sudo rm /root/partition-root.txt
