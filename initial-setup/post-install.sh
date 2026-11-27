@@ -51,7 +51,7 @@ case $(cat /etc/hostname) in
         sudo systemctl enable fstrim.timer --now
         sudo systemctl enable btrfs-scrub@-.timer --now
         sudo systemctl enable systemd-timesyncd --now
-        sudo systemctl enable snapper-cleanup --now
+        sudo systemctl enable snapper-cleanup.timer --now
 
         # Firewall / Printer Set-up
         sudo ufw default deny
@@ -61,9 +61,6 @@ case $(cat /etc/hostname) in
 
         # SystemD Resolved DNS
         # sudo ln -sf ../run/systemd/resolve/stub-resolv.conf /etc/resolv.conf
-
-        ./post-install-stow.sh
-        git reset --hard
 
         # Build Paru from the AUR
         # mkdir -p /home/$SUDO_USER/Projects
@@ -85,6 +82,10 @@ case $(cat /etc/hostname) in
         paru -S --needed - < ../pkgs/tmp.txt
         paruFailure=$?
         rm ../pkgs/tmp.txt
+
+        # Setup dotfiles
+        ./post-install-stow.sh
+        git reset --hard
 
         # Needed to create new Snapper configuration as the @snapshots subvolume is already
         # mounted; in the initial script could not mount the snapshots subvolume 'til after this
