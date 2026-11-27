@@ -81,6 +81,7 @@ case $(cat /etc/hostname) in
         paru -S --needed - < ../pkgs/tmp.txt
         rm ../pkgs/tmp.txt
 
+        cd ~/dotfiles/initial-setup
         ./post-install-stow.sh
         git reset --hard
 
