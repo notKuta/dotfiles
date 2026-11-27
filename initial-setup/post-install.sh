@@ -37,6 +37,15 @@ case $(cat /etc/hostname) in
         # This installs packages from a list, while not reinstalling previously
         # installed packages that are already up-to-date
         sudo pacman -Syu
+	# Install these two dependencies directly
+	# So can simply use default choice for the rest of the dependencies
+	# shown when installing main packages. For some reason in the virtual
+	# console used when no display manager is used, pacman  does not show
+	# the list of dependencies to choose from; this should help this as now
+	# we can simply press <Enter> repeatedly until done
+	sudo pacman -S --asdeps pipewire-jack
+	sudo pacman -S --asdeps lib32-nvidia-utils
+
         sudo pacman -S --needed - < ../pkgs/pkglist-poseidon.txt
         sudo pacman -S --asdeps ntsync-autoload
 
