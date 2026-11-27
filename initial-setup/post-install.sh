@@ -28,10 +28,10 @@ case $(cat /etc/hostname) in
         # printf "Hello! This is Poseidon speaking! :D\n"
 
         STEAMFIX="[multilib]"
-        sudo sed "s/^#[multilib]/${STEAMFIX}/" /etc/pacman.conf | sudo tee /etc/tmp5.conf && sudo mv /etc/tmp5.conf /etc/pacman.conf
+        sudo sed "s/^\#[multilib]/${STEAMFIX}/" /etc/pacman.conf | sudo tee /etc/tmp5.conf && sudo mv /etc/tmp5.conf /etc/pacman.conf
 
         STEAMFIXOTHER="Include = /etc/pacman.d/mirrorlist"
-        sudo sed "s/^#Include = /etc/pacman.d/mirrorlist/${STEAMFIXOTHER}/" /etc/pacman.conf | sudo tee /etc/tmp5.conf && sudo mv /etc/tmp5.conf /etc/pacman.conf
+        sudo sed "s/^\#Include = /etc/pacman.d/mirrorlist/${STEAMFIXOTHER}/" /etc/pacman.conf | sudo tee /etc/tmp5.conf && sudo mv /etc/tmp5.conf /etc/pacman.conf
 
         # This installs packages from a list, while not reinstalling previously
         # installed packages that are already up-to-date
@@ -59,7 +59,7 @@ case $(cat /etc/hostname) in
         sudo ufw enable
 
         # SystemD Resolved DNS
-        sudo ln -sf ../run/systemd/resolve/stub-resolv.conf /etc/resolv.conf
+        # sudo ln -sf ../run/systemd/resolve/stub-resolv.conf /etc/resolv.conf
 
         # Build Paru from the AUR
         # mkdir -p /home/$SUDO_USER/Projects
