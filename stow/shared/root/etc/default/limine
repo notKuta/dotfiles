@@ -1,4 +1,4 @@
-###########################################################################################################
+
 ###############################  `limine-mkinicpio-hook` associated settings ##############################
 ###########################################################################################################
 
@@ -103,7 +103,7 @@ ENABLE_VERIFICATION=yes
 ### Kernel Entries Order
 ### Wildcard "*" matches any letter in kernel entry name
 ### If ENABLE_SORT is set to "yes", only wildcard "*" entries are sorted alphabetically.
-BOOT_ORDER="*, *fallback, Snapshots"
+BOOT_ORDER="linux, linux-lts, *, *fallback, Snapshots"
 ENABLE_SORT=no
 
 
@@ -298,7 +298,7 @@ EXCLUDE_SNAPSHOT_ENTRIES="Windows*, windows*"
 ### Snapper Configuration Name
 ### Specify the Snapper configuration name. If not set, the tool will automatically detect it from "snapper list-configs".
 ### Specifying it manually improves performance by avoiding automatic detection overhead.
-SNAPPER_CONFIG_NAME="btrfs-root"
+SNAPPER_CONFIG_NAME="root"
 
 ### Root Subvolume Path
 ### If not set, the path is automatically detected during snapshot creation.
