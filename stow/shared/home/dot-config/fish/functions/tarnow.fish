@@ -1,0 +1,1 @@
+alias tarnow='tar -acf '

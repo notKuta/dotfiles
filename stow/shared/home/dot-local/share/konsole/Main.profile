@@ -9,3 +9,6 @@ CursorShape=0
 Environment=TERM=konsole-direct,COLORTERM=truecolor
 Name=Main
 Parent=FALLBACK/
+
+[Scrolling]
+HighlightScrolledLines=true
