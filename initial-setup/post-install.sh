@@ -259,6 +259,9 @@ main_install()
 
         sudo systemd-cryptenroll ${part_root} --wipe-slot=${keyslotAnswer} --tpm2-device=auto --tpm2-pcrs=4+12+15:sha256=0000000000000000000000000000000000000000000000000000000000000000
 
+	# Allows fstrim service/timer to ACTUALLY work on LUKS2-based devices
+	sudo cryptsetup --allow-discards --persistent refresh root
+
         # Konsave to apply Plasma settings
         konsave --import-profile ~/.config/main.knsv
         konsave --apply main
