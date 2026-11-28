@@ -215,7 +215,7 @@ main_install()
         clear
 
         printf "Generating recovery key for LUKS volume...\n\n"
-        sudo systemd-cryptenroll ${part_root} --recovery-key
+        sudo systemd-cryptenroll ${part_root} --recovery-key > /home/${SUDO_USER}/luks_recovery_key.txt
 
         printf "Make sure to store your recovery key in a secure location.\n"
         printf "This is what you will use if your TPM device cannot authenticate\n"
