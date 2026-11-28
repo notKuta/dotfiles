@@ -1,4 +1,3 @@
-intel-ucode
 ark
 aurorae
 base
@@ -29,6 +28,7 @@ firefoxpwa
 fish
 flatpak-kcm
 fontforge
+fprintd
 gamemode
 git
 glib2-devel
@@ -36,6 +36,7 @@ gst-plugins-good
 gst-plugins-ugly
 gwenview
 haruna
+intel-ucode
 jellyfin-mpv-shim
 kactivitymanagerd
 kate
