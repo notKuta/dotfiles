@@ -47,10 +47,12 @@ main_install()
         if [ "$(cat /etc/hostname)" == "poseidon" ]; then
 
             sudo pacman -S --asdeps lib32-nvidia-utils
+            sudo pacman -S --needed - < ../pkgs/pkglist-poseidon.txt
 
         elif [ "$(cat /etc/hostname)" == "neptune" ]; then
 
             sudo pacman -S --asdeps lib32-vulkan-intel
+            sudo pacman -S --needed - < ../pkgs/pkglist-neptune.txt
 
         else
 
@@ -62,7 +64,6 @@ main_install()
 
         # This installs packages from a list, while not reinstalling previously
         # installed packages that are already up-to-date
-        sudo pacman -S --needed - < ../pkgs/pkglist-poseidon.txt
         sudo pacman -S --asdeps ntsync-autoload
 
         # Systemd Units
@@ -107,7 +108,23 @@ main_install()
         # Extra commands needed as `paru-debug` will show up in the list
         # which is not on the AUR which results in an error
         cd ~/dotfiles/initial-setup
-        paru -Ta - < ../pkgs/foreignpkglist-poseidon.txt > ../pkgs/tmp.txt
+
+        if [ "$(cat /etc/hostname)" == "poseidon" ]; then
+
+            paru -Ta - < ../pkgs/foreignpkglist-poseidon.txt > ../pkgs/tmp.txt
+
+        elif [ "$(cat /etc/hostname)" == "neptune" ]; then
+
+            paru -Ta - < ../pkgs/foreignpkglist-neptune.txt > ../pkgs/tmp.txt
+
+        else
+
+            printf "ERROR: hostname does not match 'poseidon' or 'neptune'.\n"
+            printf "Exiting...\n"
+            exit 1;
+
+        fi
+
         paru -S --needed - < ../pkgs/tmp.txt
         paruFailure=$?
         rm ../pkgs/tmp.txt
@@ -152,12 +169,10 @@ main_install()
         if [ "$(cat /etc/hostname)" == "poseidon" ]; then
 
             NEWKERNELCMDLINE="${KERNELCMDLINE} splash quiet zswap.max_pool_percent=30"
-            echo ${NEWKERNELCMDLINE} | sudo tee /etc/kernel/cmdline > /dev/null
 
         elif [ "$(cat /etc/hostname)" == "neptune" ]; then
 
             NEWKERNELCMDLINE="${KERNELCMDLINE} splash quiet zswap.max_pool_percent=30 resume=/dev/mapper/root resume_offset=$(sudo btrfs inspect-internal map-swapfile -r /.swap/swapfile )"
-            echo ${NEWKERNELCMDLINE} | sudo tee /etc/kernel/cmdline > /dev/null
 
         else
 
@@ -166,6 +181,8 @@ main_install()
             exit 1;
 
         fi
+
+        echo ${NEWKERNELCMDLINE} | sudo tee /etc/kernel/cmdline > /dev/null
 
         # Automatically enable preloading of NVIDIA modules in order to see the plymouth
         # screen actually show up; NOTE: this breaks hibernation; also preloads the k10temp

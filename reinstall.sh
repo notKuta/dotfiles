@@ -9,7 +9,7 @@ if [ "${HOST}" == "poseidon" ]; then
 	stow -t ~ -d ./stow/shared --dotfiles -v --no-folding --restow home
 	sudo stow -t / -d ./stow/shared --dotfiles -v --no-folding --restow root
 	stow -t ~ -d ./stow/desktop --dotfiles -v --no-folding --restow home
-	sudo stow -t / -d ./desktop --dotfiles -v --no-folding --restow root
+	sudo stow -t / -d ./stow/desktop --dotfiles -v --no-folding --restow root
 elif [ "${HOST}" == "neptune" ]; then
 	echo "Continuing with laptop initialization..."
 	stow -t ~ -d ./stow/shared --dotfiles -v --no-folding --restow home
