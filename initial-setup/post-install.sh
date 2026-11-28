@@ -76,7 +76,6 @@ main_install()
         sudo systemctl enable reflector.timer --now
         sudo systemctl enable fstrim.timer --now
         sudo systemctl enable btrfs-scrub@-.timer --now
-        sudo systemctl enable systemd-timesyncd --now
         sudo systemctl enable snapper-cleanup.timer --now
 
         # Hides GUI elements related to these targets
