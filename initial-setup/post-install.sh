@@ -123,6 +123,8 @@ case $(cat /etc/hostname) in
 
         # Adds old kernel parameters to new ones and to be read from `/etc/kernel/cmdline`
         # Which is a more universal placement for kernel parameters
+        # `resume` & `resume_offset` are added for hibernation support and are needed as
+        # we are using a swapfile as our swap space
         KERNELCMDLINE=$( sudo cat /boot/EFI/arch-limine/limine.conf | grep "cmdline:" | sed -n -e 's/^.*:\ //p' )
         NEWKERNELCMDLINE="${KERNELCMDLINE} splash quiet zswap.max_pool_percent=30"
         echo ${NEWKERNELCMDLINE} | sudo tee /etc/kernel/cmdline > /dev/null
@@ -185,6 +187,11 @@ case $(cat /etc/hostname) in
 
         ;;
     "neptune")
+
+        KERNELCMDLINE=$( sudo cat /boot/EFI/arch-limine/limine.conf | grep "cmdline:" | sed -n -e 's/^.*:\ //p' )
+        NEWKERNELCMDLINE="${KERNELCMDLINE} splash quiet zswap.max_pool_percent=30 resume=/dev/mapper/root resume_offset=$(sudo btrfs inspect-internal map-swapfile -r /.swap/swapfile )"
+        echo ${NEWKERNELCMDLINE} | sudo tee /etc/kernel/cmdline > /dev/null
+
         ;;
     *)
         printf "ERROR: hostname does not match with any of the preconfigured\n"
