@@ -23,6 +23,7 @@ dosfstools
 drkonqi
 dust
 efibootmgr
+eza
 fastfetch
 filelight
 firefox
@@ -140,6 +141,7 @@ tealdeer
 texinfo
 thunderbird
 tree
+ttf-hack-nerd
 ufw
 union
 virtualbox
