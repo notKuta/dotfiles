@@ -23,10 +23,8 @@ part_root=$(sudo cat /root/partition-root.txt)
 exec 1> >(tee "stdout.log")
 exec 2> >(tee "stderr.log")
 
-case $(cat /etc/hostname) in
-    "poseidon")
-        # printf "Hello! This is Poseidon speaking! :D\n"
-
+main_install()
+{
 
         # Allows to install steam
         # We can't stow before this as introduces errors.
@@ -44,7 +42,23 @@ case $(cat /etc/hostname) in
         # the list of dependencies to choose from; this should help this as now
         # we can simply press <Enter> repeatedly until done
         sudo pacman -S --asdeps pipewire-jack
-        sudo pacman -S --asdeps lib32-nvidia-utils
+
+        # These are dependencies for steam package
+        if [ "$(cat /etc/hostname)" == "poseidon" ]; then
+
+            sudo pacman -S --asdeps lib32-nvidia-utils
+
+        elif [ "$(cat /etc/hostname)" == "neptune" ]; then
+
+            sudo pacman -S --asdeps lib32-vulkan-intel
+
+        else
+
+            printf "ERROR: hostname does not match 'poseidon' or 'neptune'.\n"
+            printf "Exiting...\n"
+            exit 1;
+
+        fi
 
         # This installs packages from a list, while not reinstalling previously
         # installed packages that are already up-to-date
@@ -65,7 +79,11 @@ case $(cat /etc/hostname) in
         sudo systemctl enable snapper-cleanup.timer --now
 
         # Hides GUI elements related to these targets
-        sudo systemctl mask hibernate.target hybrid-sleep.target suspend-then-hibernate.target --now
+        if [ "$(cat /etc/hostname)" == "poseidon" ]; then
+
+            sudo systemctl mask hibernate.target hybrid-sleep.target suspend-then-hibernate.target --now
+
+        fi
 
         # Firewall / Printer Set-up
         sudo ufw default deny
@@ -121,22 +139,44 @@ case $(cat /etc/hostname) in
         # Adds support OverlayFS in order for snapshots to act as a Live CD environment to
         # try out different packages or other things without affecting the current environment
         # as all changes exist within RAM
-        desiredHookLine="HOOKS=(base systemd autodetect microcode modconf kms keyboard sd-vconsole block sd-encrypt filesystems sd-btrfs-overlayfs fsck)"
+        desiredHookLine="HOOKS=(base systemd autodetect microcode modconf plymouth kms keyboard sd-vconsole block sd-encrypt filesystems sd-btrfs-overlayfs fsck)"
         sudo sed --in-place=.bak "s/^HOOKS=.*/${desiredHookLine}/" /etc/mkinitcpio.conf
 
         # Adds old kernel parameters to new ones and to be read from `/etc/kernel/cmdline`
         # Which is a more universal placement for kernel parameters
         # `resume` & `resume_offset` are added for hibernation support and are needed as
         # we are using a swapfile as our swap space
+
         KERNELCMDLINE=$( sudo cat /boot/EFI/arch-limine/limine.conf | grep "cmdline:" | sed -n -e 's/^.*:\ //p' )
-        NEWKERNELCMDLINE="${KERNELCMDLINE} splash quiet zswap.max_pool_percent=30"
-        echo ${NEWKERNELCMDLINE} | sudo tee /etc/kernel/cmdline > /dev/null
+
+        if [ "$(cat /etc/hostname)" == "poseidon" ]; then
+
+            NEWKERNELCMDLINE="${KERNELCMDLINE} splash quiet zswap.max_pool_percent=30"
+            echo ${NEWKERNELCMDLINE} | sudo tee /etc/kernel/cmdline > /dev/null
+
+        elif [ "$(cat /etc/hostname)" == "neptune" ]; then
+
+            NEWKERNELCMDLINE="${KERNELCMDLINE} splash quiet zswap.max_pool_percent=30 resume=/dev/mapper/root resume_offset=$(sudo btrfs inspect-internal map-swapfile -r /.swap/swapfile )"
+            echo ${NEWKERNELCMDLINE} | sudo tee /etc/kernel/cmdline > /dev/null
+
+        else
+
+            printf "ERROR: hostname does not match 'poseidon' or 'neptune'.\n"
+            printf "Exiting...\n"
+            exit 1;
+
+        fi
 
         # Automatically enable preloading of NVIDIA modules in order to see the plymouth
         # screen actually show up; NOTE: this breaks hibernation; also preloads the k10temp
         # module which is used for reading wattage / temperature of AMD CPUs thru MangoHud
-        WANTEDMODULES="MODULES=( nvidia nvidia_modeset nvidia_uvm nvidia_drm k10temp )"
-        sudo sed --in-place=.bak "s/^MODULES=.*/${WANTEDMODULES}/" /etc/mkinitcpio.conf
+
+        if [ "$(cat /etc/hostname)" == "poseidon" ]; then
+
+            WANTEDMODULES="MODULES=( nvidia nvidia_modeset nvidia_uvm nvidia_drm k10temp )"
+            sudo sed --in-place=.bak "s/^MODULES=.*/${WANTEDMODULES}/" /etc/mkinitcpio.conf
+
+        fi
 
         # Run *AFTER* installing arch-update i.e. after installing
         # our foreign, AUR packages
@@ -188,12 +228,19 @@ case $(cat /etc/hostname) in
         printf "Installation is done!\n\nRestart the system!\n\n"
         # reboot
 
+        sudo rm /root/partition-root.txt
+
+}
+
+case $(cat /etc/hostname) in
+    "poseidon")
+
+        main_install
+
         ;;
     "neptune")
 
-        KERNELCMDLINE=$( sudo cat /boot/EFI/arch-limine/limine.conf | grep "cmdline:" | sed -n -e 's/^.*:\ //p' )
-        NEWKERNELCMDLINE="${KERNELCMDLINE} splash quiet zswap.max_pool_percent=30 resume=/dev/mapper/root resume_offset=$(sudo btrfs inspect-internal map-swapfile -r /.swap/swapfile )"
-        echo ${NEWKERNELCMDLINE} | sudo tee /etc/kernel/cmdline > /dev/null
+        main_install
 
         ;;
     *)
@@ -203,5 +250,3 @@ case $(cat /etc/hostname) in
         exit 1
         ;;
 esac
-
-sudo rm /root/partition-root.txt
