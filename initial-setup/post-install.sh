@@ -9,9 +9,33 @@
 # $ git config --global core.editor nvim
 # $ git config --global init.defaultBranch main
 #
+# On the server side:
+# Create a drop-in file `/etc/ssh/sshd_config.d/20-force_publickey_auth.conf`
+# with the contents of:
+# PasswordAuthentication yes
+# AuthenticationMethods password
+# Run this on the server:
+# $ sudo systemctl start sshd
+# Then on the device being installed, run this to make sure SSH works:
+# $ ssh -oPasswordAuthentication=yes kuta@*ip-address-of-server*
+# If that works then:
+# $ sudo systemctl start sshd
+#
+# Then, on system being installed on:
 # $ ssh-keygen
-# Then, after running `ssh-keygen`, make sure to save your new public key in
-# GitHub, found under settings, in order to run:
+# Then, after running `ssh-keygen`,
+# $ cat ~/.ssh/id_ed25519 > ~/ssh_key.txt
+# Then, run:
+# $ scp -oPasswordAuthentication=yes ~/ssh_key.txt kuta@*ip-address-of-server*:~/
+#
+# Then, on the server, take this key and input it into GitHub
+#
+# Then, on the device being installed on run:
+# $ ssh -T git@github.com
+#
+# If successful, run
+#
+# Then run:
 # $ git clone ...
 # **********************************************
 
