@@ -29,6 +29,7 @@ fish
 flatpak-kcm
 fontforge
 fprintd
+fwupd
 gamemode
 git
 glib2-devel
