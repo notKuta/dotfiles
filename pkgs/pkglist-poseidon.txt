@@ -3,6 +3,7 @@ ark
 aurorae
 base
 base-devel
+bat
 bind
 bluedevil
 breeze
