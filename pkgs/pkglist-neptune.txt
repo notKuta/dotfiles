@@ -21,6 +21,7 @@ dosfstools
 drkonqi
 dust
 efibootmgr
+eza
 fastfetch
 filelight
 firefox
@@ -135,10 +136,12 @@ sudo
 swh-plugins
 system-config-printer
 systemsettings
+tailscale
 tealdeer
 texinfo
 thunderbird
 tree
+ttf-hack-nerd
 ufw
 union
 virtualbox
