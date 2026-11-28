@@ -24,7 +24,7 @@
 # Then, on system being installed on:
 # $ ssh-keygen
 # Then, after running `ssh-keygen`,
-# $ cat ~/.ssh/id_ed25519 > ~/ssh_key.txt
+# $ cat ~/.ssh/id_ed25519.pub > ~/ssh_key.txt
 # Then, run:
 # $ scp -oPasswordAuthentication=yes ~/ssh_key.txt kuta@*ip-address-of-server*:~/
 #
