@@ -76,6 +76,7 @@ linux-lts-headers
 man-db
 man-pages
 mangohud
+memtest86+
 meson
 milou
 mingw-w64-gcc
@@ -86,6 +87,7 @@ noise-suppression-for-voice
 nss-mdns
 nvidia-open
 nvidia-open-lts
+occt
 ocean-sound-theme
 opencl-headers
 openrgb
