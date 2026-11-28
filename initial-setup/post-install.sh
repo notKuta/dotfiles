@@ -64,6 +64,9 @@ case $(cat /etc/hostname) in
         sudo systemctl enable systemd-timesyncd --now
         sudo systemctl enable snapper-cleanup.timer --now
 
+        # Hides GUI elements related to these targets
+        sudo systemctl mask hibernate.target hybrid-sleep.target suspend-then-hibernate.target --now
+
         # Firewall / Printer Set-up
         sudo ufw default deny
         sudo ufw allow from 192.168.4.0/24
